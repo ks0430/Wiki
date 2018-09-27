@@ -9,7 +9,6 @@ Bootstrap includes HTML and CSS based design templates for typography, forms, bu
 > Reference:[Bootstrap 3](https://www.w3schools.com/bootstrap4/bootstrap_get_started.asp)
 
 
-
 ## .Container
 The main part of the whole layouts.The fluid one provides a full width of container.
 ```html
