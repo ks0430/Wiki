@@ -2,39 +2,115 @@
 typora-copy-images-to: ./Images
 ---
 
-# 七牛云  SSR + BBR 搭建翻墙服务器
+# 阿里云  SSR + BBR 搭建翻墙服务器
 
-七牛云实名认证后，会免费提供10gb的对象储存空间。相比阿里云，价格实惠一点。可以用来搭建图床，做内外翻墙等工具，一个月最低30元起，适合海外想要翻墙回去的人。
+在国外时，看国内的东西偶尔也会被墙。因此通过阿里云搭建ssr服务器翻回去。步骤和搭建gcp等产品相类似，这里为搭建ssr，选择了最小的服务器。
 
-## 1. 注册七牛云
+## 1. 注册阿里云
 
-进入七牛云官网，[portal.qiniu.com](https://portal.qiniu.com)，注册成为新用户。新用户需要实名认证，手持身份证拍正反面。（自拍吧）实名认证很快，几乎一两个小时就搞定，认证完会显示以下信息。
+进入阿里云官网，注册成为新用户，可以使用支付宝等方式登录。进入控制台，选择云服务器ECS。
 
-![image-20180927212650142](https://i.imgur.com/iwHLbGf.jpg)
+![image-20180927222557424](https://i.imgur.com/8cQw11z.jpg)
 
 ## 2. 新建实例
 
-选择 `云主机服务` ， `新建实例` ，选择适合的服务器，目前有提供首月一元的优惠活动，同一用户享受一次，但需要自动续费，自动续费可以在服务器创建后手动关闭。包年优惠力度会大一些。
+`实例 ` ，`新建实例` ，选择适合的服务器，这里做测试用选择了入门级的第一个实例，配置最低。
 
-这里为了翻墙做测试选择了最小的服务器，国外网络不稳定，如果服务器实例是空白的多刷新几次。
+这里为了翻墙做测试选择了最小的服务器。
 
-![，image-20180927213303572](https://i.imgur.com/wv8TxJN.jpg)
-
-最小的突发性能实例价格为29.5一个月，可以先买一个月做测试用。
-
-![image-20180927213408672](https://i.imgur.com/9ehEMV7.jpg)
+![image-20180927225501741](https://i.imgur.com/lR57PLx.jpg)
 
 实例镜像选择Ubuntu 16.04 64位
 
-![image-20180927213618118](https://i.imgur.com/Piy9dqL.jpg)
+![image-20180927225421399](http://pfpdgzoqy.bkt.gdipper.com/Evelyn/135541.jpg)
 
-后续默认设置，确认价格后提交，前往支付页面。
+下一步：网络与安全组。选择分配公网IP，视需求而定，这里选择按使用流量付费。按流量付费为0.8元1GB。
 
-七牛云不支持直接跳转支付宝等工具支付，需要先充值。前往 `财务统计` ，`账户充值` 选择喜欢的支付方式，充值相应数额。
+完成服务器配置选择后，确认订单并付款。
 
-![image-20180927214108673](https://i.imgur.com/CFmcZCr.jpg)
 
-充值成功后，前往该页面中的 `套餐订单` 支付剩余费用，支付成功后返回 `云主机服务` ，此时新建的实例正在创建中，等待创建完毕。
 
 ## 3. 实例配置
+
+前往`管理控制台`，首先配置 SSH 登录。什么是SSH? SSH 是一种网络协议，用于计算机之间的加密登录。使用 SSH 可以让你安全的登录远程服务器，SSH 会将双方的通信进行加密，用来保护用户的隐私。操作上，SSH 可以让你用不输入密码的方式登录。
+
+参考文档：[阮一峰-SSH原理与运用](http://www.ruanyifeng.com/blog/2011/12/ssh_remote_login.html)
+
+### 创建SSH Keygen
+
+如果没有创建过SSH Keygen，则使用以下命令创建SSH Keygen。
+
+```shell
+$ ssh-keygen
+```
+
+一路回车，系统会自动创建 `~/.ssh` 文件夹以及 `id_rsa.pub` 与 `id_rsa` 两个文件。pub 结尾是公钥，另一个就是私钥了。
+
+### 导入公钥
+
+打开 `id_rsa.pub` ，复制里面的内容，将其导入刚才创建的实例中。也可以用 shell 查看公钥的内容。
+
+```shell
+$ cat ~/.ssh/id_rsa.pub 
+```
+
+复制完毕后，回到阿里云实例，选择 `云服务器` ， `密钥对` ，右上角 `创建密钥对` 。
+
+密钥对名称没有要求，方便记忆就行，选择导入已有密钥对，粘贴刚才公钥的内容。如下图所示。
+
+![image-20180927232653539](https://i.imgur.com/UH4yltx.jpg)
+
+确定后，就可以在本机上远程登录该服务器了。
+
+### 登录服务器
+
+打开终端，输入以下命令即可登录远程服务器。
+
+```shell
+$ ssh root@39.104.50.172
+```
+
+## 4. SSR安装与BBR加速
+
+通俗的讲，SSR是用来翻墙的工具，BBR用来加速，解决服务器间掉包等问题。SSR 支持多平台，配置完毕后安卓，IOS，Windows，Linux都可使用。但苹果需要越狱或更换成美版，才能下载IOS版ShadowsocksR。
+
+### 1.安装SSR
+
+首先获取root权限。
+
+```shell
+$ sudo su
+```
+
+安装SSR，根据脚本提示选择。
+
+```shell
+$ wget --no-check-certificate https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocksR.sh
+chmod +x shadowsocksR.sh
+./shadowsocksR.sh 2>&1 | tee shadowsocksR.log
+```
+
+等待一段时间，安装完毕后显示以下画面。加密方式以及协议混淆可以自行选择。
+
+![image-20180927234854374](https://i.imgur.com/fJk65yM.jpg)
+
+什么都不输入，回车即为默认设置，服务器默认配置为：
+
+| Name             | Content      |
+| ---------------- | ------------ |
+| 服务器端口       | 8989         |
+| 密码             | teddysun.com |
+| 加密方式         | aes-256-cfb  |
+| 协议（Protocol） | origin       |
+| 混淆（obfs）     | plain        |
+
+### 2. 安装BBR
+
+运行以下命令：
+
+```shell
+wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh && chmod +x bbr.sh && ./bbr.sh
+```
+
+
 
