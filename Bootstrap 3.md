@@ -28,6 +28,7 @@ Bootstrap grid system is built with flexbox and allows up to 12 to colums across
 The grid system is responsive, and the colums will re-arrange automatically depending on the screen size.
 
 **4 main classes**
+
 | class    | Introduce                               |
 | -------- | --------------------------------------- |
 | .col-xs- | small devices - screen width >= 576px   |
