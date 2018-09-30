@@ -106,6 +106,43 @@ unset($arr);    // This deletes the whole array
 
 
 
+### Iterables
+
+Iterable is a pseudo-type introduced in PHP 7.1. It accepts any [array](http://php.net/manual/en/language.types.array.php) or object implementing the [Traversable](http://php.net/manual/en/class.traversable.php) interface. Both of these types are iterable using [foreach](http://php.net/manual/en/control-structures.foreach.php) and can be used with **yield from** within a [generator](http://php.net/manual/en/language.generators.php).
+
+#### 1. Defination
+
+```php
+<?php
+
+function foo(iterable $iterable) {
+    foreach ($iterable as $value) {
+        // ...
+    } 
+}
+
+?>
+```
+
+
+
+### Foreach
+
+The *foreach* construct provides an easy way to iterate over arrays. *foreach* works only on arrays and objects, and will issue an error when you try to use it on a variable with a different data type or an uninitialized variable.
+
+#### 1. Defination
+
+```php
+<?php
+$arr = array(1, 2, 3, 4);
+foreach ($arr as &$value) {
+    $value = $value * 2;
+}
+// $arr is now array(2, 4, 6, 8)
+unset($value); // break the reference with the last element
+?>
+```
+
 
 
 ## Classes and Objects
